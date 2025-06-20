@@ -1,9 +1,10 @@
 package view;
 
+import view.client.ClientView;
+import view.product.ProductView;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class MainView extends JFrame {
     private JPanel mainPanel;
@@ -19,19 +20,25 @@ public class MainView extends JFrame {
     private JPanel quotePanel;
 
     private CardLayout cardLayout;
+    private final ImageIcon imgIcon = new  ImageIcon("C:/Users/Usuario/Documents/Desarrollo/Aplicaciones/Gestion Libreria/gestion-libreria/src/main/resources/administrar.png");
 
     public MainView() {
         add(mainPanel);
         setTitle("Gestion Libreria");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
         setSize(800,600);
         setVisible(true);
+        setLocationRelativeTo(null);
+        setResizable(false);
+        setIconImage(imgIcon.getImage());
 
         cardLayout = new CardLayout();
         contentPanel.setLayout(cardLayout);
 
+
+
         clientPanel = new ClientView();
+        productPanel = new ProductView();
 
         contentPanel.add(invoicePanel, "Invoice");
         contentPanel.add(quotePanel, "Quote");

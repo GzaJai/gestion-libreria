@@ -1,4 +1,4 @@
-package view;
+package view.client;
 
 import model.dao.ClientDAO;
 import model.dao.impl.ClientDAOImpl;
