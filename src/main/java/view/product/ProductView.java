@@ -1,7 +1,12 @@
 package view.product;
 
+import util.UploadFromPDF;
+
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 public class ProductView extends JPanel {
     private JPanel mainPanel;
@@ -30,5 +35,22 @@ public class ProductView extends JPanel {
 
         addProductButton.addActionListener(e -> cardLayout.show(contentPanel, "Add Product"));
         listProductsButton.addActionListener(e -> cardLayout.show(contentPanel, "List Product"));
+        uploadFromPDFButton.addActionListener(e -> {
+            try {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Selecciona un archivo PDF");
+                fileChooser.setAcceptAllFileFilterUsed(false);
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("PDF", "pdf");
+                fileChooser.setFileFilter(filter);
+
+                int result = fileChooser.showOpenDialog(null);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    UploadFromPDF.importFromPDF(file.getAbsolutePath());
+                }
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 }

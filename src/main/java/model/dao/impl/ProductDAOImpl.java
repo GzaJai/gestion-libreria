@@ -7,16 +7,23 @@ import util.SQLiteConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class ProductDAOImpl implements ProductDAO {
+
+    private final Connection conn;
+
+    public ProductDAOImpl() {
+        this.conn = SQLiteConnection.getConnection();
+    }
+
     @Override
     public void save(Product product) throws Exception {
         String sql = "INSERT INTO product (code, name, description, purchase_price, sell_price, suggested_price, category) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = SQLiteConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, product.getCode());
             stmt.setString(2, product.getName());
             stmt.setString(3, product.getDescription());
@@ -29,8 +36,31 @@ public class ProductDAOImpl implements ProductDAO {
     }
 
     @Override
-    public void update(Product product) throws Exception {
+    public boolean update(Product product) throws Exception {
+        String sql = """
+                UPDATE product SET
+                    name = ?,
+                    description = ?,
+                    purchase_price = ?,
+                    sell_price = ?,
+                    suggested_price = ?,
+                    category = ?
+                    WHERE code = ?
+               """;
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, product.getName());
+            stmt.setString(2, product.getDescription());
+            stmt.setDouble(3, product.getPurchasePrice());
+            stmt.setDouble(4, product.getSellPrice());
+            stmt.setDouble(5, product.getSuggestedPrice());
+            stmt.setString(6, product.getCategory());
+            stmt.setLong(7, product.getCode());
 
+            int updatedRows = stmt.executeUpdate();
+            return updatedRows > 0;
+        } catch (SQLException e) {
+            return false;
+        }
     }
 
     @Override
@@ -54,7 +84,7 @@ public class ProductDAOImpl implements ProductDAO {
 
             while (rs.next()) {
                 Product product = new Product();
-                product.setCode(rs.getLong("id"));
+                product.setCode(rs.getLong("code"));
                 product.setName(rs.getString("name"));
                 product.setDescription(rs.getString("description"));
                 product.setPurchasePrice(rs.getFloat("purchase_price"));
@@ -65,7 +95,34 @@ public class ProductDAOImpl implements ProductDAO {
                 products.add(product);
             }
         }
-
         return products;
+    }
+
+    @Override
+    public Product findByCode(long code) {
+        String sql = "SELECT * FROM product WHERE code = ?";
+        Product product = new Product();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, code);
+            ResultSet result = stmt.executeQuery();
+            product.setCode(result.getLong("code"));
+            product.setName(result.getString("name"));
+            product.setDescription(result.getString("description"));
+            product.setPurchasePrice(result.getFloat("purchase_price"));
+            product.setSellPrice(result.getFloat("sell_price"));
+            product.setSuggestedPrice(result.getFloat("suggested_price"));
+            product.setCategory(result.getString("category"));
+
+            return product;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @Override
+    public boolean itExists() {
+        final String sql = "SELECT * FROM product WHERE code = ?";
+        return false;
     }
 }

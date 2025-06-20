@@ -20,7 +20,7 @@ public class ListProductsView extends JPanel {
     }
 
     private void loadProductData() {
-        String[] columnNames = {"Código", "Nombre", "Descripción", "Precio compra", "Precio venta", "Categoria"};
+        String[] columnNames = {"Código", "Nombre", "Descripción", "Precio compra", "Precio Sugerido", "Precio venta", "Categoria"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
         try {
@@ -31,6 +31,7 @@ public class ListProductsView extends JPanel {
                         p.getName(),
                         p.getDescription(),
                         p.getPurchasePrice(),
+                        p.getSuggestedPrice(),
                         p.getSellPrice(),
                         p.getCategory()
                 };
