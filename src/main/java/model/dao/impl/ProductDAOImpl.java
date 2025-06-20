@@ -105,24 +105,22 @@ public class ProductDAOImpl implements ProductDAO {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, code);
             ResultSet result = stmt.executeQuery();
-            product.setCode(result.getLong("code"));
-            product.setName(result.getString("name"));
-            product.setDescription(result.getString("description"));
-            product.setPurchasePrice(result.getFloat("purchase_price"));
-            product.setSellPrice(result.getFloat("sell_price"));
-            product.setSuggestedPrice(result.getFloat("suggested_price"));
-            product.setCategory(result.getString("category"));
 
-            return product;
+            if  (result.next()) {
+                product.setCode(result.getLong("code"));
+                product.setName(result.getString("name"));
+                product.setDescription(result.getString("description"));
+                product.setPurchasePrice(result.getFloat("purchase_price"));
+                product.setSellPrice(result.getFloat("sell_price"));
+                product.setSuggestedPrice(result.getFloat("suggested_price"));
+                product.setCategory(result.getString("category"));
+
+                return product;
+            } else  {
+                return null;
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-
-    @Override
-    public boolean itExists() {
-        final String sql = "SELECT * FROM product WHERE code = ?";
-        return false;
     }
 }

@@ -12,5 +12,4 @@ public interface ProductDAO {
     Optional<Product> findById(long id) throws Exception;
     List<Product> findAll() throws Exception;
     Product findByCode(long code) throws Exception;
-    boolean itExists();
 }

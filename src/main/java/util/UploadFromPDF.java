@@ -6,6 +6,7 @@ import model.entity.Product;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,20 +20,40 @@ public class UploadFromPDF {
 
         ProductDAO productDAO = new ProductDAOImpl();
 
+        int updatedRows = 0;
+        int newRows = 0;
+        String message = "";
+
         try {
             String pdfText = readTextFromPDF(filePath);
             List<Product> products = parseProductsFromText(pdfText);
 
             for (Product product : products) {
-                if (productDAO.findByCode(product.getCode()) != null) {
-                    productDAO.update(product);
-                } else {
+                Product existing = productDAO.findByCode(product.getCode());
+
+                if (existing == null) {
                     productDAO.save(product);
+                    newRows++;
+                } else if (existing.getSuggestedPrice() != product.getSuggestedPrice()) {
+                    productDAO.update(product);
+                    updatedRows++;
                 }
             }
+            if (updatedRows > 0) {
+                message += "se actualizaron "  + updatedRows + " productos\n";
+            }
+            if (newRows > 0) {
+                message += "se agregaron " + newRows + " productos";
+            }
+            if (newRows == 0 && updatedRows == 0) {
+                message = "No se actualizaron ni se agregaron productos";
+            }
+
+            JOptionPane.showMessageDialog(null, message);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
     }
 
     public static String readTextFromPDF(String filePath) throws IOException {
